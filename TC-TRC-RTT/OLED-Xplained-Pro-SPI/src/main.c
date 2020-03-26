@@ -171,6 +171,10 @@ void LED_init(void){
 	pmc_enable_periph_clk(LED_PLACA_PIO_ID);
 	pio_configure(LED_PLACA_PIO, PIO_OUTPUT_0, LED_PLACA_IDX_MASK, PIO_DEFAULT);
 	pio_set(LED_PLACA_PIO, LED_PLACA_IDX_MASK);
+	
+	pmc_enable_periph_clk(LED3_PIO_ID);
+	pio_configure(LED3_PIO, PIO_OUTPUT_0, LED3_IDX_MASK, PIO_DEFAULT);
+	pio_set(LED3_PIO, LED3_IDX_MASK);
 
 }
 
