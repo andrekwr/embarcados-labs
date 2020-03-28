@@ -55,6 +55,7 @@ volatile char flag_tc = 0;
 volatile char flag_tc0 = 0;
 volatile Bool f_rtt_alarme = false;
 volatile char flag_rtc = 0;
+volatile char flag_rtc_sec = 0;
 
 
 /************************************************************************/
@@ -137,6 +138,20 @@ void RTC_Handler(void)
 	if ((ul_status & RTC_SR_ALARM) == RTC_SR_ALARM) {
 			rtc_clear_status(RTC, RTC_SCCR_ALRCLR);
       flag_rtc = 1;
+	}
+	
+	/*  Verifica por qual motivo entrou
+	*  na interrupcao, se foi por segundo
+	*  ou Alarm
+	*/
+	if ((ul_status & RTC_SR_SEC) == RTC_SR_SEC) {
+
+		//
+		//  Entrou por segundo!
+		//
+		rtc_clear_status(RTC, RTC_SCCR_SECCLR);
+		
+		flag_rtc_sec = 1;
 	}
 	
 	rtc_clear_status(RTC, RTC_SCCR_ACKCLR);
@@ -279,8 +294,8 @@ int main (void)
 	gfx_mono_ssd1306_init();
   
   // Escreve na tela um circulo e um texto
-	gfx_mono_draw_filled_circle(20, 16, 16, GFX_PIXEL_SET, GFX_WHOLE);
-	gfx_mono_draw_string("mundo", 50,16, &sysfont);
+//	gfx_mono_draw_filled_circle(20, 16, 16, GFX_PIXEL_SET, GFX_WHOLE);
+//	gfx_mono_draw_string("mundo", 50,16, &sysfont);
 	
 	LED_init();
 	
@@ -292,12 +307,20 @@ int main (void)
 	
 	// mes, ano dia, semana, hora, minuto, segundo 
 	calendar rtc_initial = {2018, 3, 19, 12, 15, 45 ,1};
-	RTC_init(RTC, ID_RTC, rtc_initial, RTC_IER_ALREN);
+	RTC_init(RTC, ID_RTC, rtc_initial, RTC_IER_ALREN | RTC_IER_SECEN);
 	
 	//
 	// Configurando um alarme 
 	rtc_set_date_alarm(RTC, 1, rtc_initial.month, 1, rtc_initial.day);
 	rtc_set_time_alarm(RTC, 1, rtc_initial.hour, 1, rtc_initial.minute, 1, rtc_initial.seccond + 20);
+	
+	//Current time
+	uint32_t hour;
+	uint32_t minute;
+	uint32_t second;
+	
+	char time[30];
+	
 
   /* Insert application code here, after the board has been initialized. */
 	while(1) {
@@ -329,6 +352,15 @@ int main (void)
 		if(flag_rtc){
 			pisca_led(5, 200);
 			flag_rtc = 0;
+		}
+		
+		if(flag_rtc_sec) {
+			rtc_get_time(RTC, &hour, &minute, &second);
+			
+			sprintf(time,"%lu:%lu:%lu", hour, minute, second);
+
+			gfx_mono_draw_string(time, 30, 16, &sysfont);
+			flag_rtc_sec = 0;
 		}
 		
 		pmc_sleep(SAM_PM_SMODE_SLEEP_WFI);
