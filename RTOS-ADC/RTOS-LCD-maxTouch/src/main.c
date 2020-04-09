@@ -315,6 +315,43 @@ void task_lcd(void){
 	if (xQueueReceive( xQueueADC, &(adc), ( TickType_t )  100 / portTICK_PERIOD_MS)) {
 		char b[512];
 		sprintf(b, "%4d", adc.value);
+		font_draw_text(&arial_72, b, 50, 200, 2);
+		
+	
+		if (adc.value < 4095/3){
+			
+			ili9488_set_foreground_color(COLOR_CONVERT(COLOR_GREEN));
+			ili9488_draw_filled_circle(0, 420, adc.value-(adc.value/1.03));
+			if (adc.value < 4095/3 && adc.value > (4095/3)-100 ) {
+				ili9488_set_foreground_color(COLOR_CONVERT(COLOR_WHITE));
+				ili9488_draw_filled_circle(0, 420, 5000-(5000/1.03));
+			}
+			
+		}
+		else if(adc.value > 2*4095/3) {
+			ili9488_set_foreground_color(COLOR_CONVERT(COLOR_TOMATO));
+			ili9488_draw_filled_circle(0, 420, adc.value-(adc.value/1.03));
+			
+			
+			
+		}
+		else {
+			ili9488_set_foreground_color(COLOR_CONVERT(COLOR_YELLOW));
+			ili9488_draw_filled_circle(0, 420, adc.value-(adc.value/1.03));
+			if (adc.value < 2*4050/3 && adc.value > (2*4050/3)-100 ) {
+				ili9488_set_foreground_color(COLOR_CONVERT(COLOR_WHITE));
+				ili9488_draw_filled_circle(0, 420, 5000-(5000/1.03));
+				
+			}
+
+		}
+		
+
+		
+		
+
+
+		
 		
 		
 		
