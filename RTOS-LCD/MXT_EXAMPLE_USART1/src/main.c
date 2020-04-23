@@ -8,10 +8,7 @@
 #include "tfont.h"
 #include "digital521.h"
 
-/************************************************************************/
-/* prototypes                                                           */
-/************************************************************************/
-void but1_callback(void);
+
 
 
 /************************************************************************/
@@ -53,13 +50,19 @@ typedef struct {
 	uint32_t x;         // posicao x
 	uint32_t y;         // posicao y
 	uint8_t status;     // status
+	void (*callback)(t_but); //callback
 } t_but;
 
 QueueHandle_t xQueueTouch;
 
 /************************************************************************/
-/* handler/callbacks                                                    */
+/* prototypes                                                           */
 /************************************************************************/
+void but0_callback(t_but *but);
+void but1_callback(t_but *but);
+void but2_callback(t_but *but);
+void but3_callback(t_but *but);
+void but4_callback(t_but *but);
 
 
 /************************************************************************/
@@ -246,6 +249,34 @@ void mxt_handler(struct mxt_device *device, uint *x, uint *y)
 }
 
 /************************************************************************/
+/* handler/callbacks                                                    */
+/************************************************************************/
+void but0_callback(t_but *but) {
+	but->status = !but->status;
+	draw_button_new(*but);
+}
+
+void but1_callback(t_but *but) {
+	but->status = !but->status;
+	draw_button_new(*but);
+}
+
+void but2_callback(t_but *but) {
+	but->status = !but->status;
+	draw_button_new(*but);
+}
+
+void but3_callback(t_but *but) {
+	but->status = !but->status;
+	draw_button_new(*but);
+}
+
+void but4_callback(t_but *but) {
+	but->status = !but->status;
+	draw_button_new(*but);
+}
+
+/************************************************************************/
 /* tasks                                                                */
 /************************************************************************/
 
@@ -284,27 +315,27 @@ void task_lcd(void){
 
 	t_but but0 = {.width = 120, .height = 75,
 		.colorOn = COLOR_TOMATO, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y = 40, .status = 1 };
+	.x = ILI9488_LCD_WIDTH/2, .y = 40, .status = 1, .callback = &but0_callback };
 	draw_button_new(but0);
 	
 	t_but but1 = {.width = 120, .height = 75,
 		.colorOn = COLOR_GREEN, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y = 140, .status = 1 };
+	.x = ILI9488_LCD_WIDTH/2, .y = 140, .status = 1, .callback = &but1_callback };
 	draw_button_new(but1);
 	
 	t_but but2 = {.width = 120, .height = 75,
 		.colorOn = COLOR_GREEN, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y = 240, .status = 1 };
+	.x = ILI9488_LCD_WIDTH/2, .y = 240, .status = 1, .callback = &but2_callback };
 	draw_button_new(but2);
 	
 	t_but but3 = {.width = 120, .height = 75,
 		.colorOn = COLOR_GREEN, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y = 340, .status = 1 };
+	.x = ILI9488_LCD_WIDTH/2, .y = 340, .status = 1, .callback = &but3_callback };
 	draw_button_new(but3);
 	
 	t_but but4 = {.width = 120, .height = 75,
 		.colorOn = COLOR_GREEN, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y =440, .status = 1 };
+	.x = ILI9488_LCD_WIDTH/2, .y =440, .status = 1, .callback = &but4_callback };
 	draw_button_new(but4);
 
 	  t_but botoes[] = {but0, but1, but2, but3, but4};
@@ -317,8 +348,8 @@ void task_lcd(void){
 			int b = process_touch(botoes, touch, 5);
 			printf("b: %d\n", b);
 			if (b >= 0) {
-				botoes[b].status = !botoes[b].status;
-				draw_button_new(botoes[b]);
+				botoes[b].callback(&botoes[b]);
+				
 			}
 			printf("x:%d y:%d\n", touch.x, touch.y);
 		}
