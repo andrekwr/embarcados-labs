@@ -7,6 +7,15 @@
 #include "maxTouch/maxTouch.h"
 #include "tfont.h"
 #include "digital521.h"
+typedef struct {
+	const uint8_t *data;
+	uint16_t width;
+	uint16_t height;
+	uint8_t dataSize;
+} tImage;
+#include "icones/interrogation.h"
+#include "icones/ball.h"
+
 
 
 
@@ -51,6 +60,8 @@ typedef struct {
 	uint32_t y;         // posicao y
 	uint8_t status;     // status
 	void (*callback)(t_but); //callback
+	tImage imageOn; //imagem acionada
+	tImage imageOff; //imagem desligada
 } t_but;
 
 QueueHandle_t xQueueTouch;
@@ -148,15 +159,16 @@ void draw_screen(void) {
 
 
 void draw_button_new(t_but but){
-	uint32_t color;
-	if(but.status)
-	color = but.colorOn;
-	else
-	color = but.colorOff;
 
-	ili9488_set_foreground_color(COLOR_CONVERT(color));
-	ili9488_draw_filled_rectangle(but.x-but.width/2, but.y-but.height/2,
-	but.x+but.width/2, but.y+but.height/2);
+
+	if(but.status) {
+	ili9488_draw_pixmap(but.x-but.width/2, but.y-but.height/2, but.imageOn.width, but.imageOn.height, but.imageOn.data);
+	}
+	else {
+	ili9488_draw_pixmap(but.x-but.width/2, but.y-but.height/2, but.imageOff.width, but.imageOff.height, but.imageOff.data);
+	}
+
+	
 }
 
 
@@ -313,29 +325,29 @@ void task_lcd(void){
 	draw_screen();
 	font_draw_text(&digital52, "DEMO - BUT", 0, 0, 1);
 
-	t_but but0 = {.width = 120, .height = 75,
+	t_but but0 = {.width = 96, .height = 96,
 		.colorOn = COLOR_TOMATO, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y = 40, .status = 1, .callback = &but0_callback };
+	.x = ILI9488_LCD_WIDTH/2, .y = 40, .status = 1, .callback = &but0_callback, .imageOn = ball, .imageOff = interrogation };
 	draw_button_new(but0);
 	
-	t_but but1 = {.width = 120, .height = 75,
+	t_but but1 = {.width = 96, .height = 96,
 		.colorOn = COLOR_GREEN, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y = 140, .status = 1, .callback = &but1_callback };
+	.x = ILI9488_LCD_WIDTH/2, .y = 140, .status = 1, .callback = &but1_callback, .imageOn = ball, .imageOff = interrogation };
 	draw_button_new(but1);
 	
-	t_but but2 = {.width = 120, .height = 75,
+	t_but but2 = {.width = 96, .height = 96,
 		.colorOn = COLOR_GREEN, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y = 240, .status = 1, .callback = &but2_callback };
+	.x = ILI9488_LCD_WIDTH/2, .y = 240, .status = 1, .callback = &but2_callback, .imageOn = ball, .imageOff = interrogation };
 	draw_button_new(but2);
 	
-	t_but but3 = {.width = 120, .height = 75,
+	t_but but3 = {.width = 96, .height = 96,
 		.colorOn = COLOR_GREEN, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y = 340, .status = 1, .callback = &but3_callback };
+	.x = ILI9488_LCD_WIDTH/2, .y = 340, .status = 1, .callback = &but3_callback, .imageOn = ball, .imageOff = interrogation};
 	draw_button_new(but3);
 	
-	t_but but4 = {.width = 120, .height = 75,
+	t_but but4 = {.width = 96, .height = 96,
 		.colorOn = COLOR_GREEN, .colorOff = COLOR_BLACK,
-	.x = ILI9488_LCD_WIDTH/2, .y =440, .status = 1, .callback = &but4_callback };
+	.x = ILI9488_LCD_WIDTH/2, .y =440, .status = 1, .callback = &but4_callback, .imageOn = ball, .imageOff = interrogation };
 	draw_button_new(but4);
 
 	  t_but botoes[] = {but0, but1, but2, but3, but4};
