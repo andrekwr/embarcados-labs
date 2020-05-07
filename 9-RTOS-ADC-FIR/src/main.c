@@ -337,7 +337,7 @@ void task_lcd(void){
   t_plot plot;
   
   char buffer[64];
-  int x = 0;
+
 
   while (true) {
     if (xQueueReceive( xQueueTouch, &(touch), ( TickType_t )  0 / portTICK_PERIOD_MS)) {
@@ -348,19 +348,10 @@ void task_lcd(void){
       sprintf(buffer, "%04d", plot.raw);
       font_draw_text(&calibri_36, buffer, 0, 0, 2);
    
-      if (x < ILI9488_LCD_WIDTH) {
-	      ili9488_set_foreground_color(COLOR_CONVERT(COLOR_BLACK));
-	      ili9488_draw_filled_circle(x, ILI9488_LCD_HEIGHT - plot.raw / 16, 2 );
-	      ili9488_set_foreground_color(COLOR_CONVERT(COLOR_RED));
-	      ili9488_draw_filled_circle(x, ILI9488_LCD_HEIGHT - plot.filtrado/ 16, 2 );
+      ili9488_set_foreground_color(COLOR_CONVERT(COLOR_BLACK));
+      ili9488_draw_filled_circle(80 * cos(2*PI*plot.filtrado/4095) + ILI9488_LCD_WIDTH/2, 80 * sin(2*PI*plot.filtrado/4095) + ILI9488_LCD_HEIGHT/2, 2 );
 
-	      x = x + 5;
-      }
-
-      else {
-	      x = 0;
-	      draw_screen();
-      }
+      
 
     }
   }    
