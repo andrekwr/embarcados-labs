@@ -58,6 +58,15 @@ struct ili9488_opt_t g_ili9488_display_opt;
 #define BLOCK_SIZE 1   // se será processado por blocos, no caso não.
 
 const float32_t firCoeffs32[NUM_TAPS] ={0.12269166637219883,
+	0.12466396327768503,
+	0.1259892807712678,
+	0.12665508957884833,
+	0.12665508957884833,
+	0.1259892807712678,
+	0.12466396327768503,
+0.12269166637219883};
+
+const float32_t firCoeffs32_12[NUM_TAPS] ={
 	0.07930125683894955,
 	0.08147535648783032,
 	0.08323976516671625,
@@ -373,7 +382,7 @@ void task_lcd(void){
 	float32_t inputF32[BLOCK_SIZE + NUM_TAPS - 1];
 	float32_t outputF32[BLOCK_SIZE + NUM_TAPS - 1];
 	arm_fir_instance_f32 S;
-	arm_fir_init_f32(&S, NUM_TAPS, (float32_t *)&firCoeffs32[0], &firStateF32[0], BLOCK_SIZE);
+	arm_fir_init_f32(&S, NUM_TAPS, (float32_t *)&firCoeffs32_12[0], &firStateF32[0], BLOCK_SIZE);
  
       
      int i = 0;
